@@ -20,8 +20,10 @@ async function postAuthor(req, res) {
   res.status(status).json(msg);
 }
 
-function getAuthors(req, res) {
-  res.send('Hi authors');
+async function getAuthors(req, res) {
+  const db = makeDB();
+  const authors = await author.read(db);
+  res.json(authors);
 }
 
 module.exports = {
