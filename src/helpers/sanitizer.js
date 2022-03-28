@@ -1,0 +1,1 @@
+exports.sanitize = author => author;
