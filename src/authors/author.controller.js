@@ -1,23 +1,22 @@
 const makeDB = require('../database');
 const author = require('./author.model');
-const { sanitize } = require('../helpers/sanitizer');
-const { validate } = require('../helpers/validator');
+const { sanitize } = require('../helpers/sanitizers');
+const { validate } = require('../helpers/validators');
 
-function postRequest({ body }) {
+async function postRequest({ body }) {
   const sanitizedAuthor = sanitize(body);
   const validatedAuthor = validate(sanitizedAuthor);
 
   const db = makeDB();
-  author.insert(db, validatedAuthor);
-
+  await author.insert(db, validatedAuthor);
   return {
     status: 200,
     msg: `${body.firstName} Created Succefully`,
   };
 }
 
-function postAuthor(req, res) {
-  const { status, msg } = postRequest({ body: req.body });
+async function postAuthor(req, res) {
+  const { status, msg } = await postRequest({ body: req.body });
   res.status(status).json(msg);
 }
 
