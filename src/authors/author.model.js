@@ -17,4 +17,15 @@ module.exports = {
       throw new Error(`#read error: ${error}`);
     }
   },
+  async readSingle(db, username) {
+    try {
+      const response = await db.query(
+        'SELECT * FROM authors WHERE username=$1',
+        [username]
+      );
+      return response.rows.at(0);
+    } catch (error) {
+      throw new Error(`#read single error: ${error}`);
+    }
+  },
 };

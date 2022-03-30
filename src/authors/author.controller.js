@@ -26,7 +26,14 @@ async function getAuthors(req, res) {
   res.json(authors);
 }
 
+async function getSingleAuthor(req, res) {
+  const db = makeDB();
+  const singleAuthor = await author.readSingle(db, req.params.username);
+  res.json(singleAuthor);
+}
+
 module.exports = {
   getAuthors,
   postAuthor,
+  getSingleAuthor,
 };
