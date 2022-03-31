@@ -1,53 +1,45 @@
 const makeDB = require('../database');
-const author = require('./author.model');
+const Author = require('./author.model');
 const { sanitize } = require('../helpers/sanitizers');
 const { validate } = require('../helpers/validators');
 
-async function getAuthors(_, res) {
+module.exports.getAuthors = async (_, res) => {
   const db = makeDB();
-  const authors = await author(db).readAll();
+  const authors = await Author.readAll(db);
   res.json(authors);
-}
+};
 
-async function postRequest({ body }) {
+const postRequest = async ({ body }) => {
   const sanitizedAuthor = sanitize(body);
   const validatedAuthor = validate(sanitizedAuthor);
 
   const db = makeDB();
-  await author(db).insert(validatedAuthor);
+  await Author.insert(db, validatedAuthor);
   return {
     status: 200,
     msg: `${body.firstName} Created Succefully`,
   };
-}
+};
 
-async function postAuthor(req, res) {
+module.exports.postAuthor = async (req, res) => {
   const { status, msg } = await postRequest({ body: req.body });
   res.status(status).json(msg);
-}
+};
 
-async function getSingleAuthor(req, res) {
+module.exports.getSingleAuthor = async (req, res) => {
   const db = makeDB();
-  const singleAuthor = await author(db).readSingle(req.params.username);
+  const singleAuthor = await Author.readSingle(db, req.params.username);
   res.json(singleAuthor);
-}
+};
 
-async function deleteSingleAuthor(req, res) {
+module.exports.deleteAuthor = async (req, res) => {
   const db = makeDB();
-  await author(db).delete(req.params.username);
+  await Author.delete(db, req.params.username);
   res.status(200).send(`${req.params.username} deleted successfully`);
-}
+};
 
-async function putSingleAuthor(req, res) {
+module.exports.putAuthor = async (req, res) => {
   const db = makeDB();
-  await author(db).update(req.params.id);
+  await Author.update(db, req.params.id);
   res.status(200).send(`${req.params.username} deleted successfully`);
-}
-
-module.exports = {
-  getAuthors,
-  getSingleAuthor,
-  postAuthor,
-  deleteSingleAuthor,
-  putSingleAuthor,
 };

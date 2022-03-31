@@ -3,15 +3,15 @@ const {
   getAuthors,
   postAuthor,
   getSingleAuthor,
-  deleteSingleAuthor,
-  putSingleAuthor,
+  deleteAuthor,
+  putAuthor,
 } = require('./author.controller');
 
 router.route('/').get(getAuthors).post(postAuthor);
 router
   .route('/:username')
   .get(getSingleAuthor)
-  .delete(deleteSingleAuthor)
-  .put(putSingleAuthor);
+  .delete(deleteAuthor)
+  .put(putAuthor);
 
 module.exports = router;
