@@ -1,45 +1,55 @@
 module.exports = class Blog {
-  static async readAll(db) {
-    try {
-      const response = await db.query('SELECT * FROM blogs');
-      return response.rows;
-    } catch (error) {
-      throw new Error(`readAll error: ${error}`);
-    }
-  }
-
-  static async readSingle(db, slug) {
-    const statement = 'SELECT * FROM blogs WHERE slug=$1';
-    const response = await db.query(statement, [slug]);
-    if (response.rowCount === 0) {
-      return { msg: "blog doesn't exist" };
-    }
-    return response.rows.at(0);
-  }
-
-  static async insert(db, { title, body, author, slug }) {
+  static async readAll(db, { username }) {
     const statement =
-      'INSERT INTO blogs (title,body,author,slug) VALUES ($1,$2,$3,$4)';
-    const response = await db.query(statement, [title, body, author, slug]);
+      'SELECT * FROM blogs INNER JOIN authors ON authors.username=$1';
+    const response = await db.query(statement, [username]);
+
+    if (response.rowCount === 0) {
+      return {
+        status: 200,
+        payload: `${username} has no blogs`,
+      };
+    }
     return {
       status: 200,
-      payload: response,
+      payload: response.rows,
     };
   }
 
-  static async delete(db, slug) {
-    const statement = 'DELETE FROM blogs WHERE slug=$1';
-    const response = await db.query(statement, [slug]);
+  static async readSingle(db, { username, slug }) {
+    const statement =
+      'SELECT * FROM blogs INNER JOIN authors ON authors.username=$1 AND blogs.slug=$2';
+    const response = await db.query(statement, [username, slug]);
+
     if (response.rowCount === 0) {
       return {
         status: 404,
-        payload: 'Blog to delete not found',
+        payload: 'Not found!',
       };
     }
-    console.log(typeof response);
     return {
-      status: 204,
-      payload: null,
+      status: 200,
+      payload: response.rows.at(0),
+    };
+  }
+
+  static async update() {
+    return 1;
+  }
+
+  static async delete(db, { username, slug }) {
+    const statement = '';
+    const response = await db.query(statement, [username, slug]);
+
+    if (response.rowCount === 0) {
+      return {
+        status: 404,
+        payload: `${username} not Found`,
+      };
+    }
+    return {
+      status: 201,
+      payload: `${username} deleted succeffully`,
     };
   }
 };

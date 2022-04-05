@@ -3,7 +3,7 @@ module.exports = class Author {
     const statement = 'SELECT * FROM authors';
     try {
       const dbResponse = await db.query(statement);
-      return dbResponse.rows;
+      return { status: 200, payload: dbResponse.rows };
     } catch (error) {
       throw new Error(`#read error: ${error}`);
     }
@@ -14,9 +14,9 @@ module.exports = class Author {
     try {
       const response = await db.query(statement, [username]);
       if (response.rowCount === 0) {
-        return { msg: "author doesn't exist" };
+        return { status: 404, payload: "author doesn't exist" };
       }
-      return response.rows.at(0);
+      return { status: 200, payload: response.rows.at(0) };
     } catch (error) {
       throw new Error(`#read single error: ${error}`);
     }
@@ -44,7 +44,11 @@ module.exports = class Author {
   static async delete(db, username) {
     const statement = 'DELETE FROM authors WHERE username=$1';
     try {
-      db.query(statement, [username]);
+      const response = await db.query(statement, [username]);
+      if (response.rowCount === 0) {
+        return { status: 404, payload: 'author to delete not found' };
+      }
+      return { status: 204, payload: null };
     } catch (error) {
       throw new Error('#delete error');
     }
@@ -53,7 +57,7 @@ module.exports = class Author {
   static async update(db, username) {
     const statement = 'UPDATE authors WHERE username=$1';
     try {
-      db.query(statement, [username]);
+      await db.query(statement, [username]);
     } catch (error) {
       throw new Error('#update error');
     }

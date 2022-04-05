@@ -5,8 +5,8 @@ const { validate } = require('../helpers/validators');
 
 module.exports.getAuthors = async (_, res) => {
   const db = makeDB();
-  const authors = await Author.readAll(db);
-  res.json(authors);
+  const { status, payload } = await Author.readAll(db);
+  res.status(status).json(payload);
 };
 
 const postRequest = async ({ body }) => {
@@ -17,29 +17,28 @@ const postRequest = async ({ body }) => {
   await Author.insert(db, validatedAuthor);
   return {
     status: 200,
-    msg: `${body.firstName} Created Succefully`,
+    payload: `${body.firstName} Created Succefully`,
   };
 };
 
 module.exports.postAuthor = async (req, res) => {
-  const { status, msg } = await postRequest({ body: req.body });
-  res.status(status).json(msg);
+  const { status, payload } = await postRequest({ body: req.body });
+  res.status(status).json(payload);
 };
 
 module.exports.getSingleAuthor = async (req, res) => {
   const db = makeDB();
-  const singleAuthor = await Author.readSingle(db, req.params.username);
-  res.json(singleAuthor);
+  const { status, payload } = await Author.readSingle(db, req.params.username);
+  res.status(status).json(payload);
 };
 
 module.exports.deleteAuthor = async (req, res) => {
   const db = makeDB();
-  await Author.delete(db, req.params.username);
-  res.status(200).send(`${req.params.username} deleted successfully`);
+  const { status, payload } = await Author.delete(db, req.params.username);
+  res.status(status).send(payload);
 };
 
 module.exports.putAuthor = async (req, res) => {
   const db = makeDB();
-  await Author.update(db, req.params.id);
-  res.status(200).send(`${req.params.username} deleted successfully`);
+  console.log(db, req, res);
 };
